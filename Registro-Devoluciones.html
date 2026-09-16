@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registro de devoluciones | ProInv</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-1: #07111f;
+            --bg-2: #0f172a;
+            --bg-3: #111827;
+            --panel: rgba(15, 23, 42, 0.7);
+            --panel-soft: rgba(255, 255, 255, 0.04);
+            --line: rgba(148, 163, 184, 0.18);
+            --text: #edf4ff;
+            --muted: #a7b6d0;
+            --primary: #5eead4;
+            --primary-strong: #14b8a6;
+            --violet: #8b5cf6;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --shadow: 0 30px 80px rgba(2, 6, 23, 0.58);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(94, 234, 212, 0.18), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.18), transparent 32%),
+                linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+            color: var(--text);
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 30px 22px;
+            display: grid;
+            place-items: center;
+        }
+
+        .page {
+            width: min(1200px, 100%);
+            min-height: 760px;
+            display: grid;
+            grid-template-columns: 0.85fr 1.15fr;
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            overflow: hidden;
+            background: rgba(15, 23, 42, 0.42);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+            position: relative;
+        }
+
+        .page::before,
+        .page::after {
+            content: "";
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            filter: blur(18px);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .page::before {
+            background: rgba(94, 234, 212, 0.18);
+            top: -110px;
+            left: -70px;
+        }
+
+        .page::after {
+            background: rgba(139, 92, 246, 0.18);
+            right: -60px;
+            bottom: -90px;
+        }
+
+        .summary {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.9));
+            border-right: 1px solid var(--line);
+            padding: 42px 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .brand-mark {
+            display: grid;
+            place-items: center;
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--violet));
+            box-shadow: 0 14px 30px rgba(94, 234, 212, 0.26);
+        }
+
+        .brand-mark svg {
+            width: 24px;
+            height: 24px;
+            fill: #031821;
+        }
+
+        .tag {
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: 1px solid rgba(94, 234, 212, 0.25);
+            background: rgba(94, 234, 212, 0.08);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .summary h1 {
+            margin: 0 0 12px;
+            font-size: clamp(2.1rem, 3vw, 3.2rem);
+            line-height: 1.1;
+            letter-spacing: -0.07em;
+        }
+
+        .summary p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .stats {
+            display: grid;
+            gap: 16px;
+            margin-top: 28px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 16px 18px;
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, rgba(94, 234, 212, 0.18), rgba(139, 92, 246, 0.18));
+            color: var(--primary);
+        }
+
+        .stat-card strong {
+            display: block;
+            font-size: 1.3rem;
+            letter-spacing: -0.04em;
+            margin-bottom: 4px;
+        }
+
+        .stat-card span {
+            color: var(--muted);
+            font-size: 0.84rem;
+        }
+
+        .mini-panel {
+            margin-top: 28px;
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 18px 18px 14px;
+        }
+
+        .mini-panel h3 {
+            margin: 0 0 14px;
+            font-size: 0.9rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .service-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 12px;
+        }
+
+        .service-list li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .service-list li span:first-child {
+            color: var(--muted);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(52, 211, 153, 0.08);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+            color: #bcf7d9;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-pill::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.8);
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            padding: 36px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-card {
+            width: min(560px, 100%);
+            background: rgba(15, 23, 42, 0.72);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 24px;
+            padding: 30px 26px 24px;
+            box-shadow: 0 18px 38px rgba(2, 6, 23, 0.25);
+        }
+
+        .header {
+            margin-bottom: 22px;
+        }
+
+        .header h2 {
+            margin: 0 0 8px;
+            font-size: clamp(1.8rem, 2vw, 2.5rem);
+            letter-spacing: -0.06em;
+        }
+
+        .header p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            color: var(--text);
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            background: rgba(15, 23, 42, 0.5);
+            color: var(--text);
+            border-radius: 14px;
+            padding: 14px 16px;
+            font-size: 0.96rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: rgba(167, 182, 208, 0.75);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: rgba(94, 234, 212, 0.7);
+            box-shadow: 0 0 0 4px rgba(94, 234, 212, 0.08);
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .secondary-btn,
+        .primary-btn {
+            border: none;
+            border-radius: 14px;
+            height: 50px;
+            padding: 0 18px;
+            font-size: 0.96rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-strong), var(--violet));
+            color: #061620;
+            box-shadow: 0 16px 26px rgba(20, 184, 166, 0.22);
+        }
+
+        .secondary-btn:hover,
+        .primary-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 920px) {
+            .page {
+                grid-template-columns: 1fr;
+            }
+
+            .summary {
+                border-right: none;
+                border-bottom: 1px solid var(--line);
+            }
+        }
+
+        @media (max-width: 560px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content,
+            .summary {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+
+            .actions {
+                flex-direction: column-reverse;
+            }
+
+            .secondary-btn,
+            .primary-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <aside class="summary">
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2.75a9.25 9.25 0 0 1 9.25 9.25A9.25 9.25 0 0 1 12 21.25 9.25 9.25 0 0 1 2.75 12 9.25 9.25 0 0 1 12 2.75Zm2.6 5.45h-5.2a1.35 1.35 0 0 0-1.35 1.35v5.2a1.35 1.35 0 0 0 1.35 1.35h5.2a1.35 1.35 0 0 0 1.35-1.35v-5.2a1.35 1.35 0 0 0-1.35-1.35Zm-1.06 2.27h.73v3.74h-2.2v-1.34h-1.54v-2.4h3.01Zm-3.2 2.72h1.54v1.34h-1.54v-1.34Z"/>
+                    </svg>
+                </div>
+                <span class="tag">ProInv</span>
+            </div>
+
+            <h1>Devoluciones</h1>
+            <p>Registra y controla los productos devueltos para mantener un inventario preciso y un servicio al cliente más confiable.</p>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-icon" aria-hidden="true">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12h18"/>
+                            <path d="M12 3v18"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <strong>128</strong>
+                        <span>Devoluciones este mes</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" aria-hidden="true">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19h16"/>
+                            <path d="M7 16V8"/>
+                            <path d="M12 16V5"/>
+                            <path d="M17 16v-6"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <strong>96%</strong>
+                        <span>Procesadas correctamente</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mini-panel">
+                <h3>Estado del día</h3>
+                <ul class="service-list">
+                    <li><span>Inventario revisado</span><span class="status-pill">Activo</span></li>
+                    <li><span>Solicitudes pendientes</span><strong>14</strong></li>
+                    <li><span>Material dañado</span><strong>3</strong></li>
+                </ul>
+            </div>
+        </aside>
+
+        <section class="content">
+            <div class="form-card">
+                <header class="header">
+                    <h2>Registrar devolución</h2>
+                    <p>Captura los datos del producto devuelto y su motivo de ingreso.</p>
+                </header>
+
+                <form>
+                    <div class="grid">
+                        <div class="field">
+                            <label for="folio">Folio</label>
+                            <input id="folio" type="text" value="DEV-2048" readonly />
+                        </div>
+
+                        <div class="field">
+                            <label for="fecha">Fecha</label>
+                            <input id="fecha" type="date" />
+                        </div>
+
+                        <div class="field full">
+                            <label for="cliente">Cliente</label>
+                            <input id="cliente" type="text" placeholder="Nombre del cliente o empresa" />
+                        </div>
+
+                        <div class="field">
+                            <label for="producto">Producto</label>
+                            <input id="producto" type="text" placeholder="Ej. Laptop Dell Latitude" />
+                        </div>
+
+                        <div class="field">
+                            <label for="codigo">Código / SKU</label>
+                            <input id="codigo" type="text" placeholder="SKU-00123" />
+                        </div>
+
+                        <div class="field">
+                            <label for="cantidad">Cantidad</label>
+                            <input id="cantidad" type="number" min="1" placeholder="1" />
+                        </div>
+
+                        <div class="field">
+                            <label for="motivo">Motivo</label>
+                            <select id="motivo">
+                                <option value="">Selecciona un motivo</option>
+                                <option>Defecto de fabricación</option>
+                                <option>Entrega incorrecta</option>
+                                <option>Producto no conforme</option>
+                                <option>Cliente no solicitó</option>
+                                <option>Daño en tránsito</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="estado">Estado del producto</label>
+                            <select id="estado">
+                                <option value="">Selecciona un estado</option>
+                                <option>Nuevo</option>
+                                <option>Usado</option>
+                                <option>Con falla</option>
+                                <option>Dañado</option>
+                            </select>
+                        </div>
+
+                        <div class="field full">
+                            <label for="observaciones">Observaciones</label>
+                            <textarea id="observaciones" placeholder="Describe las condiciones de la devolución, daños o comentarios del cliente..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button type="button" class="secondary-btn">Cancelar</button>
+                        <button type="submit" class="primary-btn">Guardar devolución</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
